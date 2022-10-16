@@ -1,0 +1,10 @@
+
+- creation of a event object
+
+- os polling routine
+- output comparison
+-  email generator
+- xmpp message generator
+-conf file parser 
+
+
