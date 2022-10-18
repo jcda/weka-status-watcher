@@ -2,6 +2,8 @@
 a python3 script to monitor changes in weka alert and report them by email or xmpp
 README.txt
 
+how to obtain an authentication token
+https://docs.weka.io/usage/security#obtaining-an-authentication-token
 
 #install
 

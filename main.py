@@ -4,7 +4,8 @@ import subprocess
 import json
 import os
 import smtplib, ssl
-import xmpp
+import requests
+#import nbxmpp
 
 def setconfigfile():  #set a dummy file for the config if the file couldnt be found
     #
@@ -23,16 +24,21 @@ def setconfigfile():  #set a dummy file for the config if the file couldnt be fo
     config['DEFAULT']['ForwardX11'] = 'yes'
     with open('example.ini', 'w') as configfile:
         config.write(configfile)
+        print('Config file not found, a dummy one was added to the directory to fill with your data')
+
+
 def readconfigfile():
     #
     #    TBC
     #
     config = configparser.ConfigParser()
-       config.sections()
-    
-       config.read('example.ini')
-    
-       config.sections()
+      # config.sections()
+    try: 
+        with config.read('example.ini'):
+            return(config)
+    except IOError:
+        setconfigfile()
+      # config.sections()
     #['bitbucket.org', 'topsecret.server.com']
     #>>> 'bitbucket.org' in config
     #True
@@ -82,20 +88,62 @@ def sendmail():
     finally:
             server.quit() 
 
-def sendxmpp():
-    username = 'username'
-    passwd = 'password'
-    to='name@example.com'
-    msg='hello :)'
+
+def queryAPI():
+    ## step 1 is the connection   TBC
+    url = "https://weka01:14000/api/v2/login"
+
+    payload="{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}"
+    headers = {
+             'Content-Type': 'application/json'
+             }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    #print(response.text)
+    # Expected Response
+    #{
+    #    "data": [
+    #                  {
+    #                            "access_token": "ACCESS-TOKEN",
+    #                                  "token_type": "Bearer",
+    #                                        "expires_in": 300,
+    #                                              "refresh_token": "REFRESH-TOKEN"
+    #                                                  }
+    #                    ]
+    #          }
+    #
+     
+    ## step 2 alerts query TBC
+    import requests
+
+    url = "https://weka01:14000/api/v2/cluster"
+    # this will be replaced by alerts
+    payload={}
+    headers = {
+              'Authorization': 'Bearer REPLACE-WITH-ACCESS-TOKEN'
+              }
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+
+    print(response.text)
 
 
-    client = xmpp.Client('gmail.com')
-    client.connect(server=('talk.google.com',5223))
-    client.auth(username, passwd, 'botty')
-    client.sendInitPresence()
-    message = xmpp.Message(to, msg)
-    message.setAttr('type', 'chat')
-    client.send(message)
+
+#def sendxmpp():    #Jabber function TBC  currently a dependency with gi
+#    username = 'username'
+#    passwd = 'password'
+#    to='name@example.com'
+#    msg='hello :)'
+#
+#
+#    client = nbxmpp.Client('gmail.com')
+#    client.connect(server=('talk.google.com',5223))
+#    client.auth(username, passwd, 'botty')
+#    client.sendInitPresence()
+#    message = nbxmpp.Message(to, msg)
+#    message.setAttr('type', 'chat')
+#    client.send(message)
 
 
 # creation of a json model for an example
@@ -109,7 +157,7 @@ alert_dict =  {
 print(type(alert_dict))
 #the formatting of this one was just plain awful
 #alerts_dict = os.system('weka alerts -f json')
-alerts_dict = subprocess.check_output(["weka","alerts","-f","json"])
+alerts_dict = subprocess.check_output(["weka","alerts","-J"])
 print(type(alerts_dict))
 print(alerts_dict)
 foo = str(alerts_dict)
@@ -154,4 +202,5 @@ print(bar)
 
 #with open('alerts.txt', 'w') as json_file:
 #    json.dump(alert_dict, json_file)
+
 
